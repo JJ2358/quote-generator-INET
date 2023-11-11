@@ -1,28 +1,54 @@
-﻿using System;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using QuoteGeneratorAPI.Models;
 using System.Collections.Generic;
 
-namespace quoteGeneratorAPI.Controllers {
-    // attribute is required for Web APIs
-    [ApiController]  
-    // disabling CORs for requests / responses of public Web API - eliminates CORs errors if this web API is used with a client side web app
+namespace QuoteGeneratorAPI.Controllers
+{
+    [ApiController]
     [DisableCors]
+    public class QuoteAPIController : ControllerBase
+    {
+        private readonly QuoteManager _quoteManager;
 
-    public class QuoteAPIController : ControllerBase {
+        public QuoteAPIController()
+        {
+            _quoteManager = new QuoteManager();
+        }
 
-        // set to get instead of HttpPost
+        // GET: api/quotes
         [HttpGet]
-        // the URL routing - Web APIs must have one
-        [Route("data/")]
-        public ActionResult<List<string>> Get() {
-            // for this action method to return JSON, you only need to have it return a List of data
-            // this test List is an example only!
-            List<string> test = new List<string>() { "hello","world","with","json" };
-            
-            // test this out by hitting http://localhost:5011/data
-            return test;
-        }        
+        [Route("api/quotes")]
+        public ActionResult<IEnumerable<Quote>> Get()
+        {
+            return Ok(_quoteManager.GetQuotes());
+        }
+
+        // POST: api/quotes
+        [HttpPost]
+        [Route("api/quotes")]
+        public IActionResult Post([FromBody] Quote quote)
+        {
+            _quoteManager.AddQuote(quote);
+            return Ok();
+        }
+
+        // PUT: api/quotes/5
+        [HttpPut]
+        [Route("api/quotes/{id}")]
+        public IActionResult Put(int id, [FromBody] Quote quote)
+        {
+            _quoteManager.UpdateQuote(id, quote);
+            return Ok();
+        }
+
+        // DELETE: api/quotes/5
+        [HttpDelete]
+        [Route("api/quotes/{id}")]
+        public IActionResult Delete(int id)
+        {
+            _quoteManager.DeleteQuote(id);
+            return Ok();
+        }
     }
-    
 }
