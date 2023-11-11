@@ -1,12 +1,19 @@
-﻿@model IEnumerable<QuoteGeneratorAPI.Models.Quote>
+﻿@{
+    ViewData["Title"] = "Quote Generator";
+}
 
-<h1>Quotes Administration</h1>
+<h2>@ViewData["Title"]</h2>
 
-@foreach (var quote in Model)
-{
-    <div>
-        <h2>@quote.Author</h2>
-        <p>@quote.QuoteText</p>
-        <!-- Add more details and controls as needed -->
-    </div>
+<div id="quoteList">
+    <!-- This section will be populated with quotes from the database -->
+</div>
+
+<button id="addQuote">Add Quote</button>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // JavaScript to load quotes and handle add, update, delete actions
+        });
+    </script>
 }
