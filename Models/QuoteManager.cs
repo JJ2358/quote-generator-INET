@@ -14,7 +14,7 @@ namespace QuoteGeneratorAPI.Models
             using (var connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
-                var query = "SELECT * FROM tblQuotes";
+                var query = "SELECT * FROM Quotes";
 
                 using (var command = new MySqlCommand(query, connection))
                 using (var reader = command.ExecuteReader())
@@ -25,7 +25,7 @@ namespace QuoteGeneratorAPI.Models
                         {
                             Id = Convert.ToInt32(reader["id"]),
                             Author = reader["author"].ToString(),
-                            QuoteText = reader["quote"].ToString(),
+                            QuoteText = reader["QuoteText"].ToString(),
                             
                         };
                         quotes.Add(quote);

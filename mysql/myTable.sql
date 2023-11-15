@@ -15,9 +15,7 @@ CREATE TABLE IF NOT EXISTS `Quotes` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
---
--- Dumping data for table `tblGrades`
---
+
 
 -- Sample Data
 INSERT INTO `Quotes` (`Author`, `QuoteText`, `Permalink`, `Image`) VALUES
