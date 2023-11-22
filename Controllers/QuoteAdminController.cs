@@ -34,7 +34,6 @@ namespace QuoteGeneratorAPI.Controllers
         }
 
         // POST: admin/quotes/create
-        [HttpPost]
         public async Task<IActionResult> Create(Quote quote, IFormFile image)
         {
             try
@@ -48,6 +47,7 @@ namespace QuoteGeneratorAPI.Controllers
                     }
 
                     _quoteManager.AddQuote(quote);
+                    TempData["Message"] = "Quote added successfully";
                     return RedirectToAction("Index"); // Redirecting to Index action
                 }
             }
@@ -58,6 +58,7 @@ namespace QuoteGeneratorAPI.Controllers
             }
             return View(quote);
         }
+
 
         // GET: admin/quotes/edit/5
         public IActionResult Edit(int id)

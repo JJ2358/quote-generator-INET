@@ -7,51 +7,31 @@
 <h2>@ViewData["Title"]</h2>
 
 <!-- Add Quote Form -->
-<form asp-action="AddQuote" method="post" enctype="multipart/form-data">
+<form asp-action="Create" method="post" enctype="multipart/form-data">
     <div>
-        <label for="author">Author:</label>
-        <input type="text" id="author" name="author" required>
+        <label for="Author">Author:</label>
+        <input type="text" id="Author" name="Author" required>
     </div>
     <div>
-        <label for="quoteText">Quote:</label>
-        <input type="text" id="quoteText" name="quoteText" required>
+        <label for="QuoteText">Quote:</label>
+        <input type="text" id="QuoteText" name="QuoteText" required>
     </div>
     <div>
-        <label for="permalink">Permalink (optional):</label>
-        <input type="url" id="permalink" name="permalink">
+        <label for="Permalink">Permalink (optional):</label>
+        <input type="url" id="Permalink" name="Permalink">
     </div>
     <div>
-        <label for="image">Image:</label>
-        <input type="file" id="image" name="image">
+        <label for="Image">Image:</label>
+        <input type="file" id="Image" name="Image">
     </div>
     <button type="submit">Add Quote</button>
 </form>
 
-<!-- Display Quotes -->
-@* <div id="quoteList">
-    @if (Model != null && Model.Any())
-    {
-        <ul>
-            @foreach (var quote in Model)
-            {
-                <li>
-                    <strong>@quote.Author:</strong> @quote.QuoteText
-                    <!-- Display image if available -->
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p>No quotes available.</p>
-    }
-</div> *@
-
 <!-- Delete Quote Section -->
-<form asp-action="DeleteQuote" method="post">
+<form asp-action="DeleteConfirmed" method="post">
     <div>
         <label for="quoteToDelete">Select a Quote to Delete:</label>
-        <select id="quoteToDelete" name="quoteId">
+        <select id="quoteToDelete" name="Id">
             @foreach (var quote in Model)
             {
                 <option value="@quote.Id">@quote.Author - @quote.QuoteText</option>
@@ -60,7 +40,3 @@
     </div>
     <button type="submit">Delete Quote</button>
 </form>
-
-@section Scripts {
-    <script src="~/js/site.js"></script>
-}
