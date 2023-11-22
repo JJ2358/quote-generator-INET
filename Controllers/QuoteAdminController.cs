@@ -34,6 +34,8 @@ namespace QuoteGeneratorAPI.Controllers
         }
 
         // POST: admin/quotes/create
+        [HttpPost]
+        [Route("admin/quotes/create")]
         public async Task<IActionResult> Create(Quote quote, IFormFile image)
         {
             try
@@ -45,20 +47,18 @@ namespace QuoteGeneratorAPI.Controllers
                         var imagePath = await _quoteManager.SaveImage(image);
                         quote.Image = imagePath;
                     }
-
                     _quoteManager.AddQuote(quote);
                     TempData["Message"] = "Quote added successfully";
-                    return RedirectToAction("Index"); // Redirecting to Index action
+                    return RedirectToAction("Index"); // Redirect to Index action
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred in Create method"); // Log the error
+                _logger.LogError(ex, "Error occurred in Create method");
                 ModelState.AddModelError("", "An error occurred while creating the quote.");
             }
-            return View(quote);
+            return RedirectToAction("Index"); // Redirect to Index even if there's an error
         }
-
 
         // GET: admin/quotes/edit/5
         public IActionResult Edit(int id)
@@ -119,6 +119,7 @@ namespace QuoteGeneratorAPI.Controllers
         }
 
         [HttpPost]
+        [Route("admin/quotes/add")] // Unique route for AddQuote
         public async Task<IActionResult> AddQuote(Quote quote, IFormFile image)
         {
             if (ModelState.IsValid)
@@ -129,30 +130,25 @@ namespace QuoteGeneratorAPI.Controllers
                     var imagePath = await SaveImage(image);
                     quote.Image = imagePath;
                 }
-
                 _quoteManager.AddQuote(quote);
                 return RedirectToAction("Index");
             }
-
             return View(quote);
         }
+
         private async Task<string> SaveImage(IFormFile imageFile)
         {
             var uploadPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
-
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);
             }
-
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
             var filePath = Path.Combine(uploadPath, uniqueFileName);
-
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(fileStream);
             }
-
             return Path.Combine("uploads", uniqueFileName);
         }
 
@@ -161,6 +157,5 @@ namespace QuoteGeneratorAPI.Controllers
             var quotes = _quoteManager.GetQuotes();
             return View("Index", quotes);
         }
-
     }
 }

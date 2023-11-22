@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace QuoteGeneratorAPI.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")] // Added route prefix
     [DisableCors]
     public class QuoteAPIController : ControllerBase
     {
