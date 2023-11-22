@@ -24,6 +24,20 @@ namespace QuoteGeneratorAPI.Controllers
             return Ok(_quoteManager.GetQuotes());
         }
 
+        // GET: api/quotes/5
+        [HttpGet]
+        [Route("api/quotes/{id}")]
+        public ActionResult<Quote> Get(int id)
+        {
+            var quote = _quoteManager.GetQuoteById(id);
+            if (quote == null)
+            {
+                return NotFound();
+            }
+            return Ok(quote);
+        }
+
+
         // POST: api/quotes
         [HttpPost]
         [Route("api/quotes")]

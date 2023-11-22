@@ -1,24 +1,23 @@
 -- Host: localhost:3306
--- Generation Time: Sep 25, 2016 at 10:48 PM
--- Server version: 5.6.33
--- PHP Version: 5.6.20
+-- Generation Time: [Your Generation Time]
+-- Server version: [Your Server Version]
+-- PHP Version: [Your PHP Version]
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
+-- Create the Quotes table
 CREATE TABLE IF NOT EXISTS `Quotes` (
   `Id` int(10) NOT NULL AUTO_INCREMENT,
-  `Author` varchar(100),
+  `Author` varchar(100) NOT NULL,
   `QuoteText` text NOT NULL,
-  `Permalink` varchar(100),
-  `Image` varchar(100),
+  `Permalink` varchar(255), -- Optional permalink
+  `Image` varchar(255), -- Path to the image file
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
-
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Sample Data
 INSERT INTO `Quotes` (`Author`, `QuoteText`, `Permalink`, `Image`) VALUES
-('Author 1', 'This is a sample quote 1', 'http://example.com/1', 'image1.jpg'),
-('Author 2', 'This is a sample quote 2', 'http://example.com/2', 'image2.jpg'),
-('Author 3', 'This is a sample quote 3', 'http://example.com/3', 'image3.jpg');
+('Author 1', 'This is a sample quote 1', 'http://example.com/1', 'path/to/image1.jpg'),
+('Author 2', 'This is a sample quote 2', 'http://example.com/2', 'path/to/image2.jpg'),
+('Author 3', 'This is a sample quote 3', 'http://example.com/3', 'path/to/image3.jpg');

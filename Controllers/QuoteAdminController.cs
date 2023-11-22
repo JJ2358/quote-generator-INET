@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using QuoteGeneratorAPI.Models;
 using System;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace QuoteGeneratorAPI.Controllers
 {
     public class QuoteAdminController : Controller
     {
         private readonly QuoteManager _quoteManager;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public QuoteAdminController()
         {
@@ -96,6 +99,42 @@ namespace QuoteGeneratorAPI.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Additional methods for handling image uploads and other functionalities can be added here
+        [HttpPost]
+        public async Task<IActionResult> AddQuote(Quote quote, IFormFile image)
+        {
+            if (ModelState.IsValid)
+            {
+                if (image != null)
+                {
+                    // Handle image saving here
+                    var imagePath = await SaveImage(image);
+                    quote.Image = imagePath;
+                }
+
+                _quoteManager.AddQuote(quote);
+                return RedirectToAction("Index");
+            }
+
+            return View(quote);
+        }
+        private async Task<string> SaveImage(IFormFile imageFile)
+        {
+            var uploadPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
+
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
+
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+            var filePath = Path.Combine(uploadPath, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            return Path.Combine("uploads", uniqueFileName);
+        }
     }
 }
