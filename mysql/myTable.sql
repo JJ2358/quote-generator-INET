@@ -18,6 +18,6 @@ CREATE TABLE IF NOT EXISTS `Quotes` (
 
 -- Sample Data
 INSERT INTO `Quotes` (`Author`, `QuoteText`, `Permalink`, `Image`) VALUES
-('Author 1', 'This is a sample quote 1', 'http://example.com/1', 'path/to/image1.jpg'),
-('Author 2', 'This is a sample quote 2', 'http://example.com/2', 'path/to/image2.jpg'),
-('Author 3', 'This is a sample quote 3', 'http://example.com/3', 'path/to/image3.jpg');
+('Author 1', 'This is a sample quote 1', 'http://example.com/1', 'wwwroot/images/robot.png'),
+('Author 2', 'This is a sample quote 2', 'http://example.com/2', 'wwwroot/images/robot.png'),
+('Author 3', 'This is a sample quote 3', 'http://example.com/3', 'wwwroot/images/robot.png');

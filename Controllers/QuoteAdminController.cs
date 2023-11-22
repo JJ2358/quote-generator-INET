@@ -4,6 +4,7 @@ using QuoteGeneratorAPI.Models;
 using System;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace QuoteGeneratorAPI.Controllers
 {
@@ -11,10 +12,12 @@ namespace QuoteGeneratorAPI.Controllers
     {
         private readonly QuoteManager _quoteManager;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly ILogger<QuoteAdminController> _logger;
 
-        public QuoteAdminController()
+        public QuoteAdminController(ILogger<QuoteAdminController> logger)
         {
             _quoteManager = new QuoteManager();
+            _logger = logger;
         }
 
         // GET: admin/quotes
@@ -32,20 +35,26 @@ namespace QuoteGeneratorAPI.Controllers
 
         // POST: admin/quotes/create
         [HttpPost]
-        public IActionResult Create(Quote quote, IFormFile image)
+        public async Task<IActionResult> Create(Quote quote, IFormFile image)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    if (image != null)
+                    {
+                        var imagePath = await _quoteManager.SaveImage(image);
+                        quote.Image = imagePath;
+                    }
+
                     _quoteManager.AddQuote(quote);
-                    // Handle image upload if necessary
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index"); // Redirecting to Index action
                 }
             }
             catch (Exception ex)
             {
-                // Log the error (uncomment ex variable name and write a log.)
+                _logger.LogError(ex, "Error occurred in Create method"); // Log the error
+                ModelState.AddModelError("", "An error occurred while creating the quote.");
             }
             return View(quote);
         }
@@ -75,7 +84,8 @@ namespace QuoteGeneratorAPI.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error (uncomment ex variable name and write a log.)
+                _logger.LogError(ex, "Error occurred in Edit method"); // Log the error
+                ModelState.AddModelError("", "An error occurred while editing the quote.");
             }
             return View(quote);
         }
@@ -91,12 +101,20 @@ namespace QuoteGeneratorAPI.Controllers
             return View(quote);
         }
 
-        // POST: admin/quotes/delete/5
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            _quoteManager.DeleteQuote(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _quoteManager.DeleteQuote(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in DeleteConfirmed method"); // Log the error
+                // Redirect to an error view or display a message
+                return RedirectToAction("Error", new { message = "An error occurred while deleting the quote." });
+            }
         }
 
         [HttpPost]
@@ -136,5 +154,12 @@ namespace QuoteGeneratorAPI.Controllers
 
             return Path.Combine("uploads", uniqueFileName);
         }
+
+        public IActionResult IndexAfterSubmit()
+        {
+            var quotes = _quoteManager.GetQuotes();
+            return View("Index", quotes);
+        }
+
     }
 }
