@@ -11,10 +11,11 @@ namespace QuoteGeneratorAPI.Models
 
         [MaxLength(100)]
         // [Url(ErrorMessage = "The Permalink must be a valid URL.")]
-        public string Permalink { get; set; } = "";
+        [StringLength(100, ErrorMessage = "The Permalink must be a maximum length of 100 characters.")]
+        public string? Permalink { get; set; }
 
-        [MaxLength(100)]
-        public string Image { get; set; } = "";
+        
+        public string? Image { get; set; }
     }
 
 }

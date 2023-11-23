@@ -138,7 +138,6 @@ namespace QuoteGeneratorAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddQuote(Quote quote, IFormFile image)
         {
-            // Basic logging to see the incoming data
             _logger.LogInformation($"Received quote: {quote.Author}, {quote.QuoteText}");
 
             if (ModelState.IsValid)
@@ -148,14 +147,14 @@ namespace QuoteGeneratorAPI.Controllers
                     // Handle image upload if present
                     if (image != null && image.Length > 0)
                     {
-                        var imagePath = await SaveImage(image);
+                        var imagePath = await _quoteManager.SaveImage(image);
                         quote.Image = imagePath;
                     }
 
                     // Add the quote to the database
                     _quoteManager.AddQuote(quote);
                     TempData["Message"] = $"Quote '{quote.Author} - {quote.QuoteText}' has been added.";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index)); // PRG pattern
                 }
                 catch (Exception ex)
                 {
@@ -165,7 +164,7 @@ namespace QuoteGeneratorAPI.Controllers
             }
             else
             {
-                // Log specific model state errors
+                // Log and handle model state errors
                 foreach (var modelState in ViewData.ModelState.Values)
                 {
                     foreach (var error in modelState.Errors)
@@ -178,6 +177,7 @@ namespace QuoteGeneratorAPI.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
 
