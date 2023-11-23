@@ -19,6 +19,7 @@ namespace QuoteGeneratorAPI.Controllers
         {
             _quoteManager = new QuoteManager();
             _logger = logger;
+            
         }
 
         // GET: admin/quotes
@@ -134,35 +135,50 @@ namespace QuoteGeneratorAPI.Controllers
             }
         }
         [HttpPost]
-        [Route("admin/quotes/add")] // Unique route for AddQuote
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddQuote(Quote quote, IFormFile image)
         {
             if (ModelState.IsValid)
             {
-                if (image != null)
+                try
                 {
-                    // Handle image saving here
-                    var imagePath = await SaveImage(image);
-                    quote.Image = imagePath;
+                    if (image != null && image.Length > 0)
+                    {
+                        var imagePath = await SaveImage(image);
+                        quote.Image = imagePath;
+                    }
+
+                    _quoteManager.AddQuote(quote);
+                    TempData["Message"] = $"Quote '{quote.Author} - {quote.QuoteText}' has been added.";
+                    return RedirectToAction(nameof(Index));
                 }
-                _quoteManager.AddQuote(quote);
-                return RedirectToAction("Index");
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred in AddQuote method");
+                    ModelState.AddModelError("", "An error occurred while adding the quote.");
+                }
             }
-            return View(quote);
+            else
+            {
+                TempData["Error"] = "Invalid quote data. Please check your input.";
+            }
+
+            // Redirect back to the Index view, which contains the form.
+            return RedirectToAction(nameof(Index));
         }
 
-        private async Task<string> SaveImage(IFormFile imageFile)
+        private async Task<string> SaveImage(IFormFile image)
         {
             var uploadPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);
             }
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
             var filePath = Path.Combine(uploadPath, uniqueFileName);
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                await imageFile.CopyToAsync(fileStream);
+                await image.CopyToAsync(fileStream);
             }
             return Path.Combine("uploads", uniqueFileName);
         }
