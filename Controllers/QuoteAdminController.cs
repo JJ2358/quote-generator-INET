@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace QuoteGeneratorAPI.Controllers
 {
+    
     public class QuoteAdminController : Controller
     {
         private readonly QuoteManager _quoteManager;
@@ -35,30 +36,35 @@ namespace QuoteGeneratorAPI.Controllers
 
         // POST: admin/quotes/create
         [HttpPost]
-        [Route("admin/quotes/create")]
-        public async Task<IActionResult> Create(Quote quote, IFormFile image)
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Quote quote)
         {
-            try
+            _logger.LogInformation("Attempting to create a new quote with Author: {Author} and Text: {Text}", quote.Author, quote.QuoteText);
+
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                try
                 {
-                    if (image != null)
-                    {
-                        var imagePath = await _quoteManager.SaveImage(image);
-                        quote.Image = imagePath;
-                    }
                     _quoteManager.AddQuote(quote);
-                    TempData["Message"] = "Quote added successfully";
-                    return RedirectToAction("Index"); // Redirect to Index action
+                    TempData["Message"] = $"Quote '{quote.Author} - {quote.QuoteText}' has been added.";
+                    _logger.LogInformation("Quote successfully added.");
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred while adding a quote");
+                    TempData["Error"] = "An error occurred while adding the quote.";
+                }
+                
+                return RedirectToAction(nameof(IndexAfterSubmit));
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "Error occurred in Create method");
-                ModelState.AddModelError("", "An error occurred while creating the quote.");
+                _logger.LogWarning("Model state is invalid. Quote not added.");
+                TempData["Error"] = "Invalid quote data. Please check your input.";
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction("Index"); // Redirect to Index even if there's an error
         }
+
 
         // GET: admin/quotes/edit/5
         public IActionResult Edit(int id)
@@ -103,11 +109,21 @@ namespace QuoteGeneratorAPI.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             try
             {
-                _quoteManager.DeleteQuote(id);
+                var quote = _quoteManager.GetQuoteById(id);
+                if (quote != null)
+                {
+                    _quoteManager.DeleteQuote(id);
+                    TempData["Message"] = $"Quote '{quote.Author} - {quote.QuoteText}' has been deleted.";
+                }
+                else
+                {
+                    TempData["Error"] = "Quote not found.";
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -117,7 +133,6 @@ namespace QuoteGeneratorAPI.Controllers
                 return RedirectToAction("Error", new { message = "An error occurred while deleting the quote." });
             }
         }
-
         [HttpPost]
         [Route("admin/quotes/add")] // Unique route for AddQuote
         public async Task<IActionResult> AddQuote(Quote quote, IFormFile image)
@@ -155,7 +170,8 @@ namespace QuoteGeneratorAPI.Controllers
         public IActionResult IndexAfterSubmit()
         {
             var quotes = _quoteManager.GetQuotes();
-            return View("Index", quotes);
+           return RedirectToAction(nameof(Index));
+
         }
     }
 }
