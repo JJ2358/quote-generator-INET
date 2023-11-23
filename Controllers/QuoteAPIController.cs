@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace QuoteGeneratorAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] // Added route prefix
+    [Route("api/[controller]")] // Controller route prefix
     [DisableCors]
     public class QuoteAPIController : ControllerBase
     {
@@ -19,15 +19,13 @@ namespace QuoteGeneratorAPI.Controllers
 
         // GET: api/quotes
         [HttpGet]
-        [Route("api/quotes")]
         public ActionResult<IEnumerable<Quote>> Get()
         {
             return Ok(_quoteManager.GetQuotes());
         }
 
         // GET: api/quotes/5
-        [HttpGet]
-        [Route("api/quotes/{id}")]
+        [HttpGet("{id}")] 
         public ActionResult<Quote> Get(int id)
         {
             var quote = _quoteManager.GetQuoteById(id);
@@ -38,10 +36,8 @@ namespace QuoteGeneratorAPI.Controllers
             return Ok(quote);
         }
 
-
         // POST: api/quotes
         [HttpPost]
-        [Route("api/quotes")]
         public IActionResult Post([FromBody] Quote quote)
         {
             _quoteManager.AddQuote(quote);
@@ -49,8 +45,7 @@ namespace QuoteGeneratorAPI.Controllers
         }
 
         // PUT: api/quotes/5
-        [HttpPut]
-        [Route("api/quotes/{id}")]
+        [HttpPut("{id}")] // Simplified route template
         public IActionResult Put(int id, [FromBody] Quote quote)
         {
             _quoteManager.UpdateQuote(id, quote);
@@ -58,8 +53,7 @@ namespace QuoteGeneratorAPI.Controllers
         }
 
         // DELETE: api/quotes/5
-        [HttpDelete]
-        [Route("api/quotes/{id}")]
+        [HttpDelete("{id}")] // Simplified route template
         public IActionResult Delete(int id)
         {
             _quoteManager.DeleteQuote(id);
