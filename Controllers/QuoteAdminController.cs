@@ -138,16 +138,21 @@ namespace QuoteGeneratorAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddQuote(Quote quote, IFormFile image)
         {
+            // Basic logging to see the incoming data
+            _logger.LogInformation($"Received quote: {quote.Author}, {quote.QuoteText}");
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Handle image upload if present
                     if (image != null && image.Length > 0)
                     {
                         var imagePath = await SaveImage(image);
                         quote.Image = imagePath;
                     }
 
+                    // Add the quote to the database
                     _quoteManager.AddQuote(quote);
                     TempData["Message"] = $"Quote '{quote.Author} - {quote.QuoteText}' has been added.";
                     return RedirectToAction(nameof(Index));
@@ -160,12 +165,21 @@ namespace QuoteGeneratorAPI.Controllers
             }
             else
             {
+                // Log specific model state errors
+                foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        _logger.LogError($"Model state error: {error.ErrorMessage}");
+                    }
+                }
                 TempData["Error"] = "Invalid quote data. Please check your input.";
             }
 
-            // Redirect back to the Index view, which contains the form.
             return RedirectToAction(nameof(Index));
         }
+
+
 
         private async Task<string> SaveImage(IFormFile image)
         {

@@ -8,11 +8,13 @@ namespace QuoteGeneratorAPI.Models
         [MaxLength(100)]
         public string Author { get; set; }
         public string QuoteText { get; set; }
-        
+
         [MaxLength(100)]
-        [Url(ErrorMessage = "The Permalink must be a valid URL.")]
-        public string Permalink { get; set; }
+        // [Url(ErrorMessage = "The Permalink must be a valid URL.")]
+        public string Permalink { get; set; } = "";
+
         [MaxLength(100)]
-        public string Image { get; set; }
-}
+        public string Image { get; set; } = "";
+    }
+
 }
